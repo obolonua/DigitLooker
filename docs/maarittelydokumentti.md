@@ -25,7 +25,3 @@ The project documentation will be written in English. Comments and docstrings in
 Sources
 
 * Optical Character Recognition (Wikipedia)￼
-* Convolutional Neural Networks (Wikipedia)￼
-* TensorFlow Documentation￼
-* PyTorch Documentation￼
-* OpenCV Documentation￼

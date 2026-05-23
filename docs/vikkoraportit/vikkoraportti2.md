@@ -17,4 +17,4 @@ Next week, I want to continue improving the dataset generation process and start
 | 23.5. | 3 h | Implementing the synthetic digit generator and testing image creation |
 | 23.5. | 3 h | Adding data augmentation such as rotation, blur, and noise |
 | 23.5. | 1 h | Reviewing generated samples and adjusting the project structure |
-| **Total** | **5 h** | |
+| **Total** | **7 h** | |

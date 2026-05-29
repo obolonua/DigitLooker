@@ -9,7 +9,6 @@ class ReLU:
     def forward(self, x):
         self.input = x
         return np.maximum(0, x)
-    
 
 # Softmax turns raw scores into probabilities that sum to 1 across each row.
 class Softmax:
@@ -19,3 +18,15 @@ class Softmax:
         probabilities = exp_values / np.sum(exp_values, axis=1, keepdims=True)
 
         return probabilities
+
+if __name__ == "__main__":
+    sample_input = np.array([[-2.0, 0.0, 3.0], [1.0, -4.0, 2.0]])
+
+    print("input:")
+    print(sample_input)
+
+    print("\nReLU:")
+    print(ReLU().forward(sample_input))
+
+    print("\nSoftmax:")
+    print(Softmax().forward(sample_input))

@@ -40,3 +40,81 @@ predictions = softmax.forward(output5)
 # Print the predicted class probabilities and their shape.
 print(predictions)
 print(predictions.shape)
+
+
+
+
+
+
+
+
+# ==========================================================
+# Simple MLP Forward Pass Example
+# ==========================================================
+#
+# Network architecture:
+#
+# Input Layer (784 features)
+#          ↓
+# Dense Layer (784 → 128)
+#          ↓
+# ReLU Activation
+#          ↓
+# Dense Layer (128 → 64)
+#          ↓
+# ReLU Activation
+#          ↓
+# Dense Layer (64 → 10)
+#          ↓
+# Softmax Activation
+#          ↓
+# Class Probabilities
+#
+# Explanation:
+#
+# 1. X contains 5 samples, each with 784 input features.
+#    (Equivalent to flattened 28x28 images.)
+#
+# 2. Layer 1:
+#    Computes:
+#        output = X · W + b
+#    producing 128 features for each sample.
+#
+# 3. ReLU:
+#    Replaces negative values with 0 while keeping
+#    positive values unchanged.
+#
+# 4. Layer 2:
+#    Transforms the 128 features into 64 features.
+#
+# 5. ReLU:
+#    Introduces non-linearity again.
+#
+# 6. Layer 3:
+#    Produces 10 output values (one for each class).
+#    These values are called logits.
+#
+# 7. Softmax:
+#    Converts logits into probabilities that sum to 1.
+#
+# Example output:
+#    [0.02, 0.01, 0.65, ..., 0.05]
+#
+# This means:
+#    Class 2 has a 65% predicted probability.
+#
+# Final shape:
+#    (5, 10)
+#
+# Meaning:
+#    5 samples
+#    10 class probabilities per sample
+#
+# At this stage the network only performs prediction.
+# No learning occurs yet because:
+#    - Loss is not calculated
+#    - Gradients are not computed
+#    - Weights are not updated
+#
+# These steps will be added during backpropagation and training.
+# ==========================================================

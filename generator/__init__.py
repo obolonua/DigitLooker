@@ -1,0 +1,1 @@
+"""Synthetic digit generation helpers."""

@@ -58,6 +58,16 @@ poetry run python -m tests.predict_digit
 
 The script expects the trained weights at `models/digit_mlp_weights.npz`, which is created by `poetry run python train.py`.
 
+### Run the Flask UI
+
+After training the model, start the web app with:
+
+```bash
+poetry run python app.py
+```
+
+Open `http://127.0.0.1:5000/` in your browser and click **Generate number** to create a new digit, see the generated image, and inspect the model prediction.
+
 ## Project Notes
 
 - The generators expect at least one font file in `data/fonts/`.

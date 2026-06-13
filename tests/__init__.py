@@ -1,1 +1,1 @@
-"""Tests and evaluation scripts for the project."""
+# Tests and evaluation scripts for the project.

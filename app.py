@@ -1,4 +1,4 @@
-"""Flask UI for generating synthetic digits and viewing model predictions."""
+# Flask UI for generating synthetic digits and viewing model predictions.
 
 from base64 import b64encode
 from io import BytesIO
@@ -20,7 +20,7 @@ app = Flask(__name__)
 
 
 def load_model():
-    """Load the trained MLP weights from disk into fresh layer instances."""
+    # Load the trained MLP weights from disk into fresh layer instances.
     if not MODEL_FILE.exists():
         raise FileNotFoundError(
             f"Missing model weights at {MODEL_FILE}. Train the model first with `poetry run python train.py`."
@@ -40,7 +40,7 @@ def load_model():
 
 
 def predict(image_array):
-    """Run a single digit image through the MLP and return prediction details."""
+    # Run a single digit image through the MLP and return prediction details.
     layer1, layer2 = load_model()
     relu = ReLU()
     softmax = Softmax()
@@ -59,7 +59,7 @@ def predict(image_array):
 
 
 def image_to_data_uri(image):
-    """Convert a PIL image into a data URI so it can be embedded in HTML."""
+    # Convert a PIL image into a data URI so it can be embedded in HTML.
     buffer = BytesIO()
     image.save(buffer, format="PNG")
     encoded = b64encode(buffer.getvalue()).decode("ascii")
@@ -68,7 +68,7 @@ def image_to_data_uri(image):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    """Render the landing page and optionally generate a fresh digit sample."""
+    # Render the landing page and optionally generate a fresh digit sample.
     result = None
 
     if request.method == "POST":

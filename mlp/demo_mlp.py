@@ -14,26 +14,24 @@ from mlp.activations import ReLU, Softmax
 from mlp.losses import CategoricalCrossEntropy, SoftmaxCrossEntropy
 
 
-"""
-Simple MLP walkthrough
-======================
-
-This script shows one full forward pass and one full backward pass through a
-small multilayer perceptron.
-
-What it demonstrates:
-- input tensor shape and values
-- layer weights and biases
-- linear output after each dense layer
-- ReLU activation output
-- softmax probabilities
-- loss and accuracy
-- gradients for each layer
-- a single parameter update step
-
-Use this file when you want to understand how data moves through the network
-and how gradients flow back through it.
-"""
+# Simple MLP walkthrough
+# ======================
+#
+# This script shows one full forward pass and one full backward pass through a
+# small multilayer perceptron.
+#
+# What it demonstrates:
+# - input tensor shape and values
+# - layer weights and biases
+# - linear output after each dense layer
+# - ReLU activation output
+# - softmax probabilities
+# - loss and accuracy
+# - gradients for each layer
+# - a single parameter update step
+#
+# Use this file when you want to understand how data moves through the network
+# and how gradients flow back through it.
 
 
 def print_array(name, array):

@@ -1,1 +1,1 @@
-"""Minimal MLP implementation used by the project."""
+# Minimal MLP implementation used by the project.

@@ -47,7 +47,9 @@ def apply_blur(image):
     return image.filter(ImageFilter.GaussianBlur(radius=radius))
 
 
-def generate_digit_image(digit):
+CHARACTERS = ["<", ">"] + [str(digit) for digit in range(10)] + [chr(code) for code in range(ord("A"), ord("Z") + 1)]
+
+def generate_character_image(character):
     image = Image.new("L", (IMAGE_SIZE, IMAGE_SIZE), color=255)
     draw = ImageDraw.Draw(image)
 
@@ -57,7 +59,7 @@ def generate_digit_image(digit):
     x = random.randint(4, 10)
     y = random.randint(0, 6)
 
-    draw.text((x, y), str(digit), font=font, fill=0)
+    draw.text((x, y), str(character), font=font, fill=0)
 
     image = apply_rotation(image)
     image = apply_blur(image)
@@ -71,13 +73,15 @@ def generate_digit_image(digit):
 # -----------------------------
 
 if __name__ == "__main__":
-    fig, axes = plt.subplots(2, 5, figsize=(10, 5))
+    fig, axes = plt.subplots(4, 10, figsize=(10, 5))
 
-    for digit, ax in zip(range(10), axes.flatten()):
-        image = generate_digit_image(digit)
+    for character, ax in zip(CHARACTERS, axes.flatten()):
+        image = generate_character_image(character)
         ax.imshow(image, cmap="gray")
-        ax.set_title(f"Digit {digit}")
+        ax.set_title(f"Char {character}")
         ax.axis("off")
 
     plt.tight_layout()
     plt.show()
+
+# poetry run python -m generator.render_digits

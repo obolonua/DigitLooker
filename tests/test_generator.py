@@ -19,8 +19,8 @@ class GeneratorTests(unittest.TestCase):
         )
 
     def test_generate_digit_image_properties(self):
-        # The generator should return a grayscale 28x28 image for a digit.
-        image = self.module.generate_digit_image(5)
+        # The generator should return a grayscale 28x28 image for a character.
+        image = self.module.generate_character_image("A")
 
         self.assertIsInstance(image, Image.Image)
         self.assertEqual(image.mode, "L")
@@ -49,27 +49,34 @@ class GeneratorTests(unittest.TestCase):
 
     def test_create_dataset_shape_and_labels(self):
         # Patch out randomness so this test checks dataset structure only.
-        with patch.object(self.module, "SAMPLES_PER_DIGIT", 2), patch.object(
+        with patch.object(self.module, "SAMPLES_PER_CHAR", 2), patch.object(
             self.module,
-            "generate_digit_image",
-            side_effect=lambda digit: Image.new(
-                "L", (self.module.IMAGE_SIZE, self.module.IMAGE_SIZE), color=digit * 25
+            "generate_character_image",
+            side_effect=lambda character: Image.new(
+                "L",
+                (self.module.IMAGE_SIZE, self.module.IMAGE_SIZE),
+                color=self.module.CHARACTERS.index(character) * 25,
             ),
         ):
             X, y = self.module.create_dataset()
 
-        self.assertEqual(X.shape, (20, self.module.IMAGE_SIZE * self.module.IMAGE_SIZE))
-        self.assertEqual(y.shape, (20,))
+        self.assertEqual(
+            X.shape, (len(self.module.CHARACTERS) * 2, self.module.IMAGE_SIZE * self.module.IMAGE_SIZE)
+        )
+        self.assertEqual(y.shape, (len(self.module.CHARACTERS) * 2,))
         self.assertEqual(X.dtype, np.float32)
         self.assertEqual(y.dtype, np.int64)
-        self.assertEqual(set(y.tolist()), set(range(10)))
+        self.assertEqual(set(y.tolist()), set(range(len(self.module.CHARACTERS))))
 
     def test_dataset_split_is_stratified(self):
         # This mirrors the production split logic without generating images.
         from sklearn.model_selection import train_test_split
 
-        X = np.arange(500).reshape(50, 10)
-        y = np.repeat(np.arange(10), 5)
+        samples_per_class = 5
+        X = np.arange(len(self.module.CHARACTERS) * samples_per_class * 10).reshape(
+            len(self.module.CHARACTERS) * samples_per_class, 10
+        )
+        y = np.repeat(np.arange(len(self.module.CHARACTERS)), samples_per_class)
 
         X_train, X_val, y_train, y_val = train_test_split(
             X,
@@ -81,8 +88,10 @@ class GeneratorTests(unittest.TestCase):
 
         self.assertEqual(len(X_train) + len(X_val), len(X))
         self.assertEqual(len(y_train) + len(y_val), len(y))
-        self.assertEqual(set(y_train.tolist() + y_val.tolist()), set(range(10)))
+        self.assertEqual(set(y_train.tolist() + y_val.tolist()), set(range(len(self.module.CHARACTERS))))
 
 
 if __name__ == "__main__":
     unittest.main()
+
+# poetry run python -m tests.test_generator

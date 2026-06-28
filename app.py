@@ -1,4 +1,4 @@
-# Flask UI for generating synthetic digits and viewing model predictions.
+# Flask UI for generating synthetic characters and viewing model predictions.
 
 from base64 import b64encode
 from io import BytesIO
@@ -8,7 +8,7 @@ import random
 from flask import Flask, render_template, request
 import numpy as np
 
-from generator.render_digits import generate_digit_image
+from generator.render_digits import CHARACTERS, generate_character_image
 from mlp.activations import ReLU, Softmax
 from mlp.layers import Layer
 
@@ -29,7 +29,7 @@ def load_model():
     weights = np.load(MODEL_FILE)
 
     layer1 = Layer(784, 128)
-    layer2 = Layer(128, 10)
+    layer2 = Layer(128, 38)
 
     layer1.weights = weights["layer1_weights"]
     layer1.biases = weights["layer1_biases"]
@@ -40,7 +40,7 @@ def load_model():
 
 
 def predict(image_array):
-    # Run a single digit image through the MLP and return prediction details.
+    # Run a single character image through the MLP and return prediction details.
     layer1, layer2 = load_model()
     relu = ReLU()
     softmax = Softmax()
@@ -52,10 +52,10 @@ def predict(image_array):
     layer2.forward(relu.output)
     probabilities = softmax.forward(layer2.output)[0]
 
-    predicted_digit = int(np.argmax(probabilities))
-    confidence = float(probabilities[predicted_digit])
+    predicted_class = int(np.argmax(probabilities))
+    confidence = float(probabilities[predicted_class])
 
-    return predicted_digit, confidence, probabilities
+    return predicted_class, confidence, probabilities
 
 
 def image_to_data_uri(image):
@@ -68,23 +68,25 @@ def image_to_data_uri(image):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    # Render the landing page and optionally generate a fresh digit sample.
+    # Render the landing page and optionally generate a fresh character sample.
     result = None
 
     if request.method == "POST":
-        target_digit = random.randint(0, 9)
-        image = generate_digit_image(target_digit)
-        predicted_digit, confidence, probabilities = predict(np.array(image))
+        target_class = random.randrange(len(CHARACTERS))
+        target_character = CHARACTERS[target_class]
+        image = generate_character_image(target_character)
+        predicted_class, confidence, probabilities = predict(np.array(image))
+        predicted_character = CHARACTERS[predicted_class]
 
         result = {
-            "target_digit": target_digit,
-            "predicted_digit": predicted_digit,
+            "target_character": target_character,
+            "predicted_character": predicted_character,
             "confidence": confidence,
-            "is_correct": predicted_digit == target_digit,
+            "is_correct": predicted_class == target_class,
             "image_data": image_to_data_uri(image),
             # "probabilities": [
-            #     {"digit": digit, "value": float(probabilities[digit])}
-            #     for digit in range(10)
+            #     {"class": idx, "value": float(probabilities[idx])}
+            #     for idx in range(len(CHARACTERS))
             # ],
         }
 
@@ -93,3 +95,5 @@ def index():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+# poetry run python -m app

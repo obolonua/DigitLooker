@@ -12,7 +12,7 @@ DATA_DIR = BASE_DIR / "data" / "generated"
 MODEL_DIR = BASE_DIR / "models"
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
-# Load the synthetic digit dataset produced by the data generation scripts.
+# Load the synthetic character dataset produced by the data generation scripts.
 X_train = np.load(DATA_DIR / "X_train.npy")
 y_train = np.load(DATA_DIR / "y_train.npy")
 X_val = np.load(DATA_DIR / "X_val.npy")
@@ -29,10 +29,10 @@ y_train = y_train[:4000]
 print("labels:", np.unique(y_train))
 print("train:", X_train.shape, y_train.shape)
 
-# Simple two-layer MLP for 28x28 digit classification.
+# Simple two-layer MLP for 28x28 character classification.
 layer1 = Layer(784, 128)
 relu = ReLU()
-layer2 = Layer(128, 10)
+layer2 = Layer(128, 38)
 softmax = Softmax()
 loss_function = CategoricalCrossEntropy()
 loss_backward = SoftmaxCrossEntropy()
@@ -40,7 +40,7 @@ loss_backward = SoftmaxCrossEntropy()
 # Learning rate for gradient descent updates.
 learning_rate = 0.015
 
-for epoch in range(20000):
+for epoch in range(30000):
     # Forward pass: compute logits and class probabilities.
     layer1.forward(X_train)
     relu.forward(layer1.output)
@@ -89,3 +89,5 @@ np.savez(
 )
 
 print(f"saved weights to {MODEL_DIR / 'digit_mlp_weights.npz'}")
+
+# Usage note: run with `poetry run python train.py`.

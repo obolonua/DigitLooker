@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 import random
 
-from generator.render_digits import generate_digit_image
+from generator.render_digits import CHARACTERS, generate_character_image
 from mlp.activations import ReLU, Softmax
 from mlp.layers import Layer
 
@@ -16,7 +16,7 @@ def load_model():
     weights = np.load(MODEL_FILE)
 
     layer1 = Layer(784, 128)
-    layer2 = Layer(128, 10)
+    layer2 = Layer(128, len(CHARACTERS))
 
     layer1.weights = weights["layer1_weights"]
     layer1.biases = weights["layer1_biases"]
@@ -40,16 +40,18 @@ def predict(image_array):
     return int(np.argmax(probabilities, axis=1)[0]), probabilities[0]
 
 if __name__ == "__main__":
-    # Generate a fresh synthetic digit image the model has not seen before.
+    # Generate a fresh synthetic character image the model has not seen before.
     correct = 0
     n = 100
     for i in range(n):
 
-        target_digit = random.randint(0,9)
-        image = generate_digit_image(target_digit)
+        target_digit = random.randrange(len(CHARACTERS))
+        image = generate_character_image(CHARACTERS[target_digit])
 
         predicted_digit, probabilities = predict(np.array(image))
         if target_digit == predicted_digit:
             correct += 1
 
     print("accuracy:", correct/n)
+
+# poetry run python -m tests.predict_digit

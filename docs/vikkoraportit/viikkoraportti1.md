@@ -1,20 +1,18 @@
 # Week 1
 
-During the first week, I mainly focused on planning the project and learning more about the technologies and methods I will need later in the implementation. Most of the time went into reading course materials, and researching different approaches related to OCR and neural networks.
+During the first week, I had to restart the course project because the theme changed and the original receipt-reading idea was no longer the right direction. Instead of continuing with OCR and receipts, I decided to solve the MNIST problem, which gave me a clearer and more realistic starting point for the course.
 
-I also spent time setting up the project environment. I created the Git repository, configured the basic project structure. In addition, I searched for datasets and open-source resources that could be useful for training and testing the OCR model later in the project.
+I reviewed the course materials and studied how MNIST is typically handled with neural networks, so I could plan the implementation in a more focused way.
 
-I have not started the actual implementation yet because I first wanted to get a better understanding of how OCR systems and neural networks work in practice. This week I read about image preprocessing, character recognition, and different neural network architectures commonly used in OCR tasks. I also watched a few tutorials to understand the overall workflow better.
+The biggest challenge this week was accepting that the original topic had to be replaced and making a new plan quickly. Starting over meant losing the earlier direction, but it also made the project more manageable because MNIST is a much more suitable task for the course scope.
 
-At the moment, the biggest challenge is deciding which neural network approach would be the most suitable for the project. There are many possible options, and it is still a bit difficult to estimate what level of complexity is realistic for the timeframe of the course. Another challenge is understanding how to process image data efficiently before passing it to the model.
-
-Next week, the goal is to begin building the first prototype of the application. I would like to create a simple interface for testing and start experimenting with basic image preprocessing and text recognition. If everything goes well, I should also be able to train or test a very small initial model.
+Next week, I planned to start building the first prototype for MNIST and experiment with the model architecture and training pipeline. That would be the first concrete implementation step in the restarted project.
 
 ## Time Tracking
 
 | Date | Time Spent | Description |
 | ----- | ----------- | ----------- |
-| 16.5. | 1 h | Project setup, Git repository creation, and environment configuration |
-| 16.5. | 3 h | Researching OCR methods and neural networks |
-| 16.5. | 1 h | Writing the specification document and searching for datasets and sources |
-| **Total** | **5 h** | |
+| 12.7. | 1 h | Restarting the project |
+| 12.7. | 1 h | Researching MNIST and neural network approaches for digit classification |
+| 12.7. | 1 h | Updating the project plan and looking for suitable datasets and sources |
+| **Total** | **3 h** |

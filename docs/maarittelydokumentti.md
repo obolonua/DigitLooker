@@ -4,11 +4,11 @@ This specification document defines the project work completed for the Universit
 
 Topic and Implementation
 
-The goal of this project is to implement an OCR (Optical Character Recognition) application that recognizes text from images using neural networks. The application will analyze images provided by the user and attempt to extract and recognize the text as accurately as possible.
+The goal of this project is to implement an OCR (Optical Character Recognition) application that recognizes digits from images using neural networks. The application will analyze images provided by the user and attempt to extract and recognize the digit as accurately as possible.
 
-The project will utilize machine learning and neural network methods for text recognition. The implementation will be done using an MLP. In this course, we are not allowed to use any high-level machine learning libraries. In addition, the application will include image preprocessing methods such as grayscale conversion, noise reduction, and image resizing before the image is processed by the neural network.
+The project will utilize machine learning and neural network methods for digit recognition. The implementation will be done using an MLP. In this course, we are not allowed to use any high-level machine learning libraries. In addition, the application will include image preprocessing methods such as grayscale conversion, noise reduction, and image resizing before the image is processed by the neural network.
 
-The user will be able to provide an image through the user interface, after which the application analyzes the image and returns the recognized text. The first version of the application will focus on recognizing individual characters or short text fragments. Later, the project may be expanded to support longer text inputs and more accurate text recognition.
+The user will be able to provide an image through the user interface, after which the application analyzes the image and returns the recognized digit. The first version of the application will focus on recognizing individual characters. Later, the project may be expanded to support longer digit inputs and more accurate digit recognition.
 
 According to the sources, image preprocessing operations generally work in O(n) time, where n represents the number of pixels in the image. The computational complexity of neural networks depends on the model architecture, number of layers, and number of parameters. The most computationally expensive part of the project will likely be training the neural network and processing image data.
 
@@ -24,4 +24,4 @@ The project documentation will be written in English. Comments and docstrings in
 
 Sources
 
-* Optical Character Recognition (Wikipedia)￼
+* MNIST database (Wikipedia)￼

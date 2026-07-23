@@ -8,18 +8,18 @@
   </head>
   <body>
     <main class="page">
-      <h1>Character prediction</h1>
+      <h1>Digit prediction</h1>
 
       <form method="post" class="controls">
-        <button type="submit">Generate character</button>
+        <button type="submit">Generate digit</button>
       </form>
 
       {% if result %}
       <section class="panel">
-        <img src="{{ result.image_data }}" alt="Generated character image" />
+        <img src="{{ result.image_data }}" alt="MNIST digit image" />
         <div class="results">
-          <div><span>Generated character</span><strong>{{ result.target_character }}</strong></div>
-          <div><span>Predicted character</span><strong>{{ result.predicted_character }}</strong></div>
+          <div><span>Target digit</span><strong>{{ result.target_digit }}</strong></div>
+          <div><span>Predicted digit</span><strong>{{ result.predicted_digit }}</strong></div>
           <div><span>Confidence</span><strong>{{ "%.1f"|format(result.confidence * 100) }}%</strong></div>
         </div>
       </section>

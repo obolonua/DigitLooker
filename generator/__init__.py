@@ -1,1 +1,0 @@
-# Synthetic digit generation helpers.

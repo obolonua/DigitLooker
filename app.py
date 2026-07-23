@@ -3,12 +3,12 @@
 from base64 import b64encode
 from io import BytesIO
 from pathlib import Path
-import random
 
 from flask import Flask, render_template, request
 import numpy as np
+from PIL import Image
 
-from generator.render_digits import CHARACTERS, generate_character_image
+from data.mnist import load_mnist
 from mlp.activations import ReLU, Softmax
 from mlp.layers import Layer
 
@@ -29,7 +29,7 @@ def load_model():
     weights = np.load(MODEL_FILE)
 
     layer1 = Layer(784, 128)
-    layer2 = Layer(128, 38)
+    layer2 = Layer(128, 10)
 
     layer1.weights = weights["layer1_weights"]
     layer1.biases = weights["layer1_biases"]
@@ -59,7 +59,9 @@ def predict(image_array):
 
 
 def image_to_data_uri(image):
-    # Convert a PIL image into a data URI so it can be embedded in HTML.
+    # Convert either a PIL image or a NumPy array into a data URI for HTML.
+    image = Image.fromarray(image)
+
     buffer = BytesIO()
     image.save(buffer, format="PNG")
     encoded = b64encode(buffer.getvalue()).decode("ascii")
@@ -68,26 +70,23 @@ def image_to_data_uri(image):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    # Render the landing page and optionally generate a fresh character sample.
+    # Render the landing page and show a sample MNIST digit.
     result = None
 
     if request.method == "POST":
-        target_class = random.randrange(len(CHARACTERS))
-        target_character = CHARACTERS[target_class]
-        image = generate_character_image(target_character)
+        X_train, y_train, _, _ = load_mnist()
+        sample_index = int(np.random.randint(0, len(X_train)))
+        target_digit = int(y_train[sample_index])
+        image = (X_train[sample_index].reshape(28, 28) * 255).astype(np.uint8)
         predicted_class, confidence, probabilities = predict(np.array(image))
-        predicted_character = CHARACTERS[predicted_class]
 
         result = {
-            "target_character": target_character,
-            "predicted_character": predicted_character,
+            "target_digit": target_digit,
+            "predicted_digit": predicted_class,
             "confidence": confidence,
-            "is_correct": predicted_class == target_class,
+            "is_correct": predicted_class == target_digit,
             "image_data": image_to_data_uri(image),
-            # "probabilities": [
-            #     {"class": idx, "value": float(probabilities[idx])}
-            #     for idx in range(len(CHARACTERS))
-            # ],
+            "probabilities": [{"class": idx, "value": float(probabilities[idx])} for idx in range(10)],
         }
 
     return render_template("index.html", result=result)

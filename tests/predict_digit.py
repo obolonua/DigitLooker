@@ -1,9 +1,8 @@
 from pathlib import Path
 
 import numpy as np
-import random
 
-from generator.render_digits import CHARACTERS, generate_character_image
+from data.mnist import load_mnist
 from mlp.activations import ReLU, Softmax
 from mlp.layers import Layer
 
@@ -13,10 +12,15 @@ MODEL_FILE = BASE_DIR.parent / "models" / "digit_mlp_weights.npz"
 
 
 def load_model():
+    if not MODEL_FILE.exists():
+        raise FileNotFoundError(
+            f"Missing model weights at {MODEL_FILE}. Train the model first with `poetry run python train.py`."
+        )
+
     weights = np.load(MODEL_FILE)
 
     layer1 = Layer(784, 128)
-    layer2 = Layer(128, len(CHARACTERS))
+    layer2 = Layer(128, 10)
 
     layer1.weights = weights["layer1_weights"]
     layer1.biases = weights["layer1_biases"]
@@ -25,33 +29,41 @@ def load_model():
 
     return layer1, layer2
 
+
 def predict(image_array):
     layer1, layer2 = load_model()
     relu = ReLU()
     softmax = Softmax()
 
-    x = image_array.reshape(1, -1).astype(np.float32) / 255.0
+    x = image_array.reshape(1, -1).astype(np.float32)
 
     layer1.forward(x)
     relu.forward(layer1.output)
     layer2.forward(relu.output)
-    probabilities = softmax.forward(layer2.output)
+    probabilities = softmax.forward(layer2.output)[0]
 
-    return int(np.argmax(probabilities, axis=1)[0]), probabilities[0]
+    predicted_digit = int(np.argmax(probabilities))
+    confidence = float(probabilities[predicted_digit])
+
+    return predicted_digit, confidence, probabilities
+
 
 if __name__ == "__main__":
-    # Generate a fresh synthetic character image the model has not seen before.
+    X_train, y_train, X_test, y_test = load_mnist()
+
+    sample_count = 1000
+    sample_indices = np.random.choice(len(X_test), size=sample_count, replace=False)
+
     correct = 0
-    n = 100
-    for i in range(n):
+    for index in sample_indices:
+        image = (X_test[index].reshape(28, 28) * 255).astype(np.uint8)
+        predicted_digit, confidence, _ = predict(image)
+        correct += int(predicted_digit == int(y_test[index]))
+        # print(
+        #     f"target={int(y_test[index])} predicted={predicted_digit} "
+        #     f"confidence={confidence:.3f}"
+        # )
 
-        target_digit = random.randrange(len(CHARACTERS))
-        image = generate_character_image(CHARACTERS[target_digit])
-
-        predicted_digit, probabilities = predict(np.array(image))
-        if target_digit == predicted_digit:
-            correct += 1
-
-    print("accuracy:", correct/n)
+    print(f"accuracy: {correct / sample_count:.4f}")
 
 # poetry run python -m tests.predict_digit

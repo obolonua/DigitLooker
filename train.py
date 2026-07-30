@@ -2,87 +2,150 @@ from pathlib import Path
 
 import numpy as np
 
+from data.mnist import load_mnist
 from mlp.activations import ReLU, Softmax
 from mlp.layers import Layer
 from mlp.losses import CategoricalCrossEntropy, SoftmaxCrossEntropy
-from data.mnist import load_mnist
 
 
 BASE_DIR = Path(__file__).resolve().parent
-DATA_DIR = BASE_DIR / "data" / "generated"
 MODEL_DIR = BASE_DIR / "models"
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 
-X_train, y_train, X_val, y_val = load_mnist()
+RANDOM_SEED = 42
+BATCH_SIZE = 128
+EPOCHS = 100
+LEARNING_RATE = 0.008
+VALIDATION_SIZE = 5000
 
-# Use a smaller training subset to keep experimentation fast while iterating.
-X_train = X_train[:6000]
-y_train = y_train[:6000]
-X_val = X_val[:1000]
-y_val = y_val[:1000]
+np.random.seed(RANDOM_SEED)
 
-print("labels:", np.unique(y_train))
+
+def make_batches(images, labels, batch_size):
+    # Shuffle the indexes so the batches are different in every epoch.
+    indexes = np.arange(len(images))
+    np.random.shuffle(indexes)
+
+    batches = []
+    for start in range(0, len(images), batch_size):
+        batch_indexes = indexes[start:start + batch_size]
+        image_batch = images[batch_indexes]
+        label_batch = labels[batch_indexes]
+        batches.append((image_batch, label_batch))
+
+    return batches
+
+
+def calculate_accuracy(probabilities, correct_labels):
+    predictions = np.argmax(probabilities, axis=1)
+    return np.mean(predictions == correct_labels)
+
+
+# Load the MNIST images and labels.
+X_train, y_train, X_test, y_test = load_mnist()
+
+# Use the last 5000 training images for validation.
+X_val = X_train[-VALIDATION_SIZE:]
+y_val = y_train[-VALIDATION_SIZE:]
+X_train = X_train[:-VALIDATION_SIZE]
+y_train = y_train[:-VALIDATION_SIZE]
+
 print("train:", X_train.shape, y_train.shape)
+print("val:", X_val.shape, y_val.shape)
+print("test:", X_test.shape, y_test.shape)
+print("labels:", np.unique(y_train))
 
-# Simple two-layer MLP for 28x28 digit classification.
-layer1 = Layer(784, 128)
-relu = ReLU()
-layer2 = Layer(128, 10)
+# Create the neural network.
+# The sizes are 784 -> 256 -> 128 -> 10.
+layer1 = Layer(784, 256)
+relu1 = ReLU()
+layer2 = Layer(256, 128)
+relu2 = ReLU()
+layer3 = Layer(128, 10)
 softmax = Softmax()
 loss_function = CategoricalCrossEntropy()
 loss_backward = SoftmaxCrossEntropy()
 
-# Learning rate for gradient descent updates.
-learning_rate = 0.016
+for epoch in range(EPOCHS):
+    total_loss = 0
+    total_accuracy = 0
+    batches = make_batches(X_train, y_train, BATCH_SIZE)
 
-for epoch in range(20000):
-    # Forward pass: compute logits and class probabilities.
-    layer1.forward(X_train)
-    relu.forward(layer1.output)
-    layer2.forward(relu.output)
-    softmax.forward(layer2.output)
+    for X_batch, y_batch in batches:
+        # Forward pass: move the images through all the layers.
+        layer1.forward(X_batch)
+        relu1.forward(layer1.output)
+        layer2.forward(relu1.output)
+        relu2.forward(layer2.output)
+        layer3.forward(relu2.output)
+        probabilities = softmax.forward(layer3.output)
 
-    # Measure training loss and accuracy on the current batch.
-    loss = loss_function.forward(softmax.output, y_train)
-    predictions = np.argmax(softmax.output, axis=1)
-    accuracy = np.mean(predictions == y_train)
+        loss = loss_function.forward(probabilities, y_batch)
+        accuracy = calculate_accuracy(probabilities, y_batch)
+        total_loss += loss
+        total_accuracy += accuracy
 
-    # Backward pass: propagate gradients from the loss through the network.
-    loss_backward.backward(softmax.output, y_train)
-    layer2.backward(loss_backward.dinputs)
-    relu.backward(layer2.dinputs)
-    layer1.backward(relu.dinputs)
+        # Backward pass: calculate how the weights should change.
+        loss_backward.backward(probabilities, y_batch)
+        layer3.backward(loss_backward.dinputs)
+        relu2.backward(layer3.dinputs)
+        layer2.backward(relu2.dinputs)
+        relu1.backward(layer2.dinputs)
+        layer1.backward(relu1.dinputs)
 
-    # Update weights and biases with vanilla gradient descent.
-    layer1.weights -= learning_rate * layer1.dweights
-    layer1.biases -= learning_rate * layer1.dbiases
-    layer2.weights -= learning_rate * layer2.dweights
-    layer2.biases -= learning_rate * layer2.dbiases
+        # Update the weights and biases using gradient descent.
+        layer1.weights -= LEARNING_RATE * layer1.dweights
+        layer1.biases -= LEARNING_RATE * layer1.dbiases
+        layer2.weights -= LEARNING_RATE * layer2.dweights
+        layer2.biases -= LEARNING_RATE * layer2.dbiases
+        layer3.weights -= LEARNING_RATE * layer3.dweights
+        layer3.biases -= LEARNING_RATE * layer3.dbiases
 
-    # Run the same forward path on the validation set to track generalization.
+    # Check the model with validation data after each epoch.
     layer1.forward(X_val)
-    relu.forward(layer1.output)
-    layer2.forward(relu.output)
-    softmax.forward(layer2.output)
+    relu1.forward(layer1.output)
+    layer2.forward(relu1.output)
+    relu2.forward(layer2.output)
+    layer3.forward(relu2.output)
+    val_probabilities = softmax.forward(layer3.output)
 
-    val_predictions = np.argmax(softmax.output, axis=1)
-    val_acc = np.mean(val_predictions == y_val)
+    val_loss = loss_function.forward(val_probabilities, y_val)
+    val_accuracy = calculate_accuracy(val_probabilities, y_val)
 
-    if epoch % 100 == 0 or epoch == 19999:
-        print(
-            f"epoch {epoch:5d} | loss {loss:.4f} | "
-            f"train_acc {accuracy:.4f} | val_acc {val_acc:.4f}"
-        )
+    average_loss = total_loss / len(batches)
+    average_accuracy = total_accuracy / len(batches)
 
-# Save the learned weights so they can be reused without retraining.
+    print(
+        f"epoch {epoch + 1:02d}/{EPOCHS} | "
+        f"loss {average_loss:.4f} | "
+        f"acc {average_accuracy:.4f} | "
+        f"val_loss {val_loss:.4f} | "
+        f"val_acc {val_accuracy:.4f}"
+    )
+
+# Test the finished model.
+layer1.forward(X_test)
+relu1.forward(layer1.output)
+layer2.forward(relu1.output)
+relu2.forward(layer2.output)
+layer3.forward(relu2.output)
+test_probabilities = softmax.forward(layer3.output)
+
+test_accuracy = calculate_accuracy(test_probabilities, y_test)
+test_loss = loss_function.forward(test_probabilities, y_test)
+
+# Save the trained weights so app.py can use them.
 np.savez(
     MODEL_DIR / "digit_mlp_weights.npz",
     layer1_weights=layer1.weights,
     layer1_biases=layer1.biases,
     layer2_weights=layer2.weights,
     layer2_biases=layer2.biases,
+    layer3_weights=layer3.weights,
+    layer3_biases=layer3.biases,
 )
 
+print(f"test_loss {test_loss:.4f} | test_acc {test_accuracy:.4f}")
 print(f"saved weights to {MODEL_DIR / 'digit_mlp_weights.npz'}")
 
 # Usage note: run with `poetry run python train.py`.

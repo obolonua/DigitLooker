@@ -28,21 +28,25 @@ def load_model():
 
     weights = np.load(MODEL_FILE)
 
-    layer1 = Layer(784, 128)
-    layer2 = Layer(128, 10)
+    layer1 = Layer(784, 256)
+    layer2 = Layer(256, 128)
+    layer3 = Layer(128, 10)
 
     layer1.weights = weights["layer1_weights"]
     layer1.biases = weights["layer1_biases"]
     layer2.weights = weights["layer2_weights"]
     layer2.biases = weights["layer2_biases"]
+    layer3.weights = weights["layer3_weights"]
+    layer3.biases = weights["layer3_biases"]
 
-    return layer1, layer2
+    return layer1, layer2, layer3
 
 
 def predict(image_array):
     # Run a single character image through the MLP and return prediction details.
-    layer1, layer2 = load_model()
+    layer1, layer2, layer3 = load_model()
     relu = ReLU()
+    relu2 = ReLU()
     softmax = Softmax()
 
     x = image_array.reshape(1, -1).astype(np.float32) / 255.0
@@ -50,7 +54,9 @@ def predict(image_array):
     layer1.forward(x)
     relu.forward(layer1.output)
     layer2.forward(relu.output)
-    probabilities = softmax.forward(layer2.output)[0]
+    relu2.forward(layer2.output)
+    layer3.forward(relu2.output)
+    probabilities = softmax.forward(layer3.output)[0]
 
     predicted_class = int(np.argmax(probabilities))
     confidence = float(probabilities[predicted_class])

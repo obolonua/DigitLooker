@@ -1,6 +1,8 @@
 __pycache__/
 .venv/
 .pytest_cache/
+.coverage
+htmlcov/
 .mypy_cache/
 .ruff_cache/
 .DS_Store
@@ -10,3 +12,4 @@ segmented_lines/
 receipt/
 .vscode/
 codes/
+tests/predict_digit.py

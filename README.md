@@ -20,6 +20,23 @@ poetry install
 
 The training and demo code now load MNIST directly instead of the synthetic character dataset.
 
+### Tests and coverage
+
+Run the `unittest` suite and print a coverage report:
+
+```bash
+poetry run coverage run -m unittest discover -s tests -p "test_*.py"
+poetry run coverage report
+```
+
+To generate a browsable HTML report instead, run:
+
+```bash
+poetry run coverage html
+```
+
+Then open `htmlcov/index.html`.
+
 
 ### Run the Flask UI
 

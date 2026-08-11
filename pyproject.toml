@@ -17,7 +17,22 @@ dependencies = [
     "pandas (>=3.0.5,<4.0.0)"
 ]
 
+[tool.poetry]
+package-mode = false
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "coverage (>=7.15.4,<8.0.0)"
+]
+
+[tool.coverage.run]
+branch = true
+source = ["mlp"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true

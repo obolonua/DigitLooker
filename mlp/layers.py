@@ -49,13 +49,3 @@ class Layer:
             dvalues,
             self.weights.T
         )
-
-if __name__ == "__main__":
-    layer = Layer(4, 3)
-    X = np.random.randn(5, 4)
-    layer.forward(X)
-    fake_gradient = np.random.randn(5, 3)
-    layer.backward(fake_gradient)
-    print(layer.dweights.shape)
-    print(layer.dbiases.shape)
-    print(layer.dinputs.shape)

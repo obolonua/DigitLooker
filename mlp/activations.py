@@ -25,27 +25,3 @@ class Softmax:
         self.output = exp_values / np.sum(exp_values, axis=1, keepdims=True)
 
         return self.output
-
-
-
-
-
-if __name__ == "__main__":
-    sample_input = np.array([[-2.0, 0.0, 3.0], [1.0, -4.0, 2.0]])
-
-    # print("input:")
-    # print(sample_input)
-
-    # print("\nReLU:")
-    # print(ReLU().forward(sample_input))
-
-    # print("\nSoftmax:")
-    # print(Softmax().forward(sample_input))
-
-
-    # relu = ReLU()
-    # x = np.array([[-2, 0, 3]])
-    # relu.forward(x)
-    # fake_gradients = np.array([[1, 1, 1]])
-    # relu.backward(fake_gradients)
-    # print(relu.dinputs)
